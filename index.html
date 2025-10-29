@@ -37,8 +37,10 @@
     @media (min-width:640px){.wrap{padding:20px}}
     header{display:flex;gap:12px;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg);z-index:10;padding-bottom:6px;border-bottom:1px solid var(--border);flex-wrap:wrap;row-gap:8px}
     .brand{display:flex;align-items:center;gap:10px;min-width:0}
-    .logo{width:34px;height:34px;border-radius:10px;background:var(--accent);display:grid;place-items:center;color:#fff;font-weight:700;font-size:1.05rem}
+    .logo{width:34px;height:34px;border-radius:10px;background:var(--accent);display:grid;place-items:center;overflow:hidden}
+    .logo-img{width:100%;height:100%;object-fit:cover;display:block;border-radius:inherit}
     .title{font-weight:800;letter-spacing:.2px;font-size:1.35rem;margin-bottom:2px}
+    .school{color:var(--muted);font-size:13.5px;font-weight:600}
     .actions{display:flex;gap:8px;align-items:center}
     .btn{border:1px solid var(--border);background:var(--card);color:var(--text);padding:8px 12px;border-radius:12px;display:inline-flex;gap:8px;align-items:center;cursor:pointer;font-size:15px;min-height:38px}
     .btn span{font-size:15px;white-space:nowrap}
@@ -86,9 +88,12 @@
   <div class="wrap">
     <header>
       <div class="brand" role="banner">
-        <div class="logo" aria-hidden="true">S</div>
+        <div class="logo" aria-label="Logo Sekolah">
+          <img class="logo-img" src="./logo.png" alt="Logo Sekolah" onerror="this.style.display='none'">
+        </div>
         <div>
           <div class="title">SchoolHub</div>
+          <div class="school">SMP PGII 1 Bandung</div>
           <div style="color:var(--muted);font-size:13px">Portal Terpadu Sekolah — semua aplikasi dalam satu klik</div>
         </div>
       </div>
@@ -149,7 +154,11 @@
     const APPS = [
       { id:'spmb-wawancara', name:'Wawancara SPMB', url:'https://spmbsmppgii1.netlify.app', desc:'Form & jadwal wawancara Penerimaan Siswa Baru.', icon:'users', tags:['utama','ppdb'] },
       { id:'tahfidz-tracker', name:'Tahfidz Tracker', url:'https://tahfidzpgii1.netlify.app', desc:'Setoran hafalan, penilaian, dan laporan kemajuan.', icon:'book', tags:['kelas'] },
-      { id:'portal-ekskul', name:'EkskulHub', url:'https://ekskulhubpgii1.netlify.app', desc:'Presensi, nilai, dan jurnal kegiatan ekskul.', icon:'trophy', tags:['eks','admin'] }
+      { id:'portal-ekskul', name:'EkskulHub', url:'https://ekskulhubpgii1.netlify.app', desc:'Presensi, nilai, dan jurnal kegiatan ekskul.', icon:'trophy', tags:['eks','admin'] },
+      // --- Coming soon entries ---
+      { id:'absen-sholat', name:'SholatPresence', url:'#', desc:'Pencatatan kehadiran sholat harian siswa. ', icon:'userCheck', tags:['ibadah'], soon:true },
+      { id:'infaq-hub', name:'Amanah Infaq', url:'#', desc:'Input infaq sekolah dan leaderboard per kelas.', icon:'chart', tags:['keuangan','admin'], soon:true },
+      { id:'prestasi-hub', name:'Galeri Prestasi', url:'#', desc:'Informasi prestasi siswa dan leaderboardnya.', icon:'trophy', tags:['prestasi'], soon:true }
     ];
 
     // ----- Util Storage -----
@@ -209,22 +218,34 @@
       a.className = 'card';
       a.dataset.tags = app.tags.join(',');
       a.dataset.id = app.id;
+      const status = app.soon ? `<span class="status">Segera rilis</span>` : '';
+      const favBtn = app.soon ? '' : `<button class="fav" title="Sematkan" aria-label="Sematkan ${app.name}" aria-pressed="false">★</button>`;
       a.innerHTML = `
         <div class="icon" aria-hidden="true">${getIcon(app.icon)}</div>
         <div class="meta">
           <h3>${app.name}</h3>
-          <div class="desc">${app.desc}</div>
+          <div class="desc">${app.desc}${app.soon ? "<span style='margin-left:6px;font-size:11px;color:var(--muted)'>· coming soon</span>" : ''}</div>
           <div class="tags">${app.tags.map(t=>`<span class='tag'>#${t}</span>`).join('')}</div>
         </div>
-        <button class="fav" title="Sematkan" aria-label="Sematkan ${app.name}" aria-pressed="false">★</button>
+        ${favBtn}
+        ${status}
       `;
       // klik menyimpan recent
-      a.addEventListener('click', ()=> addRecent(app.id));
+      if(!app.soon){
+        a.addEventListener('click', ()=> addRecent(app.id));
+      } else {
+        a.removeAttribute('target');
+        a.setAttribute('aria-disabled','true');
+        a.addEventListener('click', (e)=> e.preventDefault());
+      }
       // cegah klik saat tekan tombol fav
-      a.querySelector('.fav').addEventListener('click', (ev)=>{
-        ev.preventDefault(); ev.stopPropagation();
-        togglePin(app.id, ev.currentTarget);
-      });
+      const fav = a.querySelector('.fav');
+      if(fav){
+        fav.addEventListener('click', (ev)=>{
+          ev.preventDefault(); ev.stopPropagation();
+          togglePin(app.id, ev.currentTarget);
+        });
+      }
       return a;
     }
 
