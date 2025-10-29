@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SchoolHub — Portal Terpadu Sekolah</title>
+  <meta name="description" content="Semua web app sekolah dalam satu halaman — cepat, rapi, mudah dicari." />
+  <meta name="theme-color" content="#0ea5e9" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%230ea5e9'/%3E%3Ctext x='50' y='60' font-size='48' text-anchor='middle' fill='white' font-family='ui-sans-serif,system-ui' %3ES%3C/text%3E%3C/svg%3E" />
+  <style>
+    :root {
+      --bg: #0b1020;         /* dark base, we'll invert for light */
+      --card: #111827;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --accent: #0ea5e9;
+      --ring: rgba(14,165,233,.5);
+      --border: #1f2937;
+    }
+    [data-theme="light"]{
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --accent: #0ea5e9;
+      --ring: rgba(14,165,233,.35);
+      --border: #e2e8f0;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial}
+    a{color:inherit;text-decoration:none}
+    .wrap{max-width:1100px;margin:0 auto;padding:24px}
+    header{display:flex;gap:16px;align-items:center;justify-content:space-between;position:sticky;top:0;background:linear-gradient(to bottom,var(--bg) 70%,transparent);backdrop-filter:saturate(130%) blur(6px);z-index:10;padding-bottom:8px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:40px;height:40px;border-radius:12px;background:var(--accent);display:grid;place-items:center;color:#fff;font-weight:700}
+    .title{font-weight:800;letter-spacing:.2px}
+    .actions{display:flex;gap:8px}
+    .btn{border:1px solid var(--border);background:var(--card);color:var(--text);padding:10px 12px;border-radius:12px;display:inline-flex;gap:8px;align-items:center;cursor:pointer}
+    .btn:hover{outline:2px solid var(--ring)}
+    .btn[aria-pressed="true"]{outline:2px solid var(--accent)}
+    .toolbar{display:grid;grid-template-columns:1fr auto;gap:12px;margin-top:12px}
+    .search{display:flex;align-items:center;gap:8px;border:1px solid var(--border);background:var(--card);padding:10px 12px;border-radius:12px}
+    .search input{flex:1;border:none;outline:none;background:transparent;color:var(--text)}
+    .chips{display:flex;gap:8px;flex-wrap:wrap}
+    .chip{padding:8px 10px;border-radius:999px;border:1px solid var(--border);background:var(--card);font-size:13px;cursor:pointer}
+    .chip[aria-pressed="true"], .chip:focus-visible{outline:2px solid var(--ring)}
+
+    .section{margin-top:18px}
+    .section h2{font-size:14px;text-transform:uppercase;letter-spacing:.2em;color:var(--muted);margin:22px 2px 10px}
+
+    .grid{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:12px}
+    @media (min-width:640px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media (min-width:940px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+    .card{position:relative;border:1px solid var(--border);background:var(--card);border-radius:16px;padding:14px;display:flex;gap:12px;align-items:flex-start;transition:transform .04s ease}
+    .card:hover{transform:translateY(-2px);outline:2px solid var(--ring)}
+    .icon{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg, var(--accent), #22d3ee);color:white;font-weight:800}
+    .meta{flex:1;min-width:0}
+    .meta h3{margin:0 0 6px;font-size:16px;display:flex;align-items:center;gap:8px}
+    .desc{color:var(--muted);font-size:13px;line-height:1.4}
+    .tags{margin-top:10px;display:flex;gap:6px;flex-wrap:wrap}
+    .tag{font-size:11px;padding:4px 8px;border:1px dashed var(--border);border-radius:999px;color:var(--muted)}
+    .status{position:absolute;top:12px;right:12px;font-size:11px;border:1px solid var(--border);padding:4px 8px;border-radius:999px;color:var(--muted);background:rgba(2,6,23,.04)}
+    .fav{position:absolute;bottom:12px;right:12px;background:transparent;border:none;color:var(--muted);cursor:pointer}
+    .fav[aria-pressed="true"]{color:var(--accent)}
+
+    .empty{border:1px dashed var(--border);border-radius:16px;padding:20px;text-align:center;color:var(--muted)}
+    footer{margin:28px 2px 8px;color:var(--muted);font-size:13px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+    .kbd{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;border:1px solid var(--border);border-bottom-width:3px;padding:2px 6px;border-radius:6px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand" role="banner">
+        <div class="logo" aria-hidden="true">S</div>
+        <div>
+          <div class="title">SchoolHub</div>
+          <div style="color:var(--muted);font-size:13px">Portal Terpadu Sekolah — semua aplikasi dalam satu klik</div>
+        </div>
+      </div>
+      <div class="actions" role="toolbar" aria-label="Aksi">
+        <button class="btn" id="themeBtn" aria-pressed="false" title="Toggle tema (T)">🌗 <span class="hide-sm">Tema</span></button>
+        <a class="btn" href="#whatsapp" title="Hubungi admin">💬 <span class="hide-sm">Kontak</span></a>
+      </div>
+    </header>
+
+    <div class="toolbar" aria-label="Pencarian dan filter">
+      <label class="search" aria-label="Cari aplikasi">
+        🔎
+        <input id="search" type="search" placeholder="Cari aplikasi… (tekan /)" autocomplete="off" />
+      </label>
+      <div class="chips" role="group" aria-label="Kategori">
+        <button class="chip" data-cat="all" aria-pressed="true">Semua</button>
+        <button class="chip" data-cat="utama">Produk Utama</button>
+        <button class="chip" data-cat="ai">AI Tools</button>
+        <button class="chip" data-cat="kelas">Kelas & Nilai</button>
+        <button class="chip" data-cat="eks">Ekstrakurikuler</button>
+        <button class="chip" data-cat="admin">Admin</button>
+      </div>
+    </div>
+
+    <section class="section" id="pinned">
+      <h2>Disematkan</h2>
+      <div class="grid" data-grid="pinned">
+        <div class="empty">Belum ada yang disematkan. Klik ikon ★ pada kartu untuk menyematkan.</div>
+      </div>
+    </section>
+
+    <section class="section" id="recent">
+      <h2>Terakhir Dibuka</h2>
+      <div class="grid" data-grid="recent">
+        <div class="empty">Belum ada riwayat. Aplikasi yang Anda klik akan muncul di sini.</div>
+      </div>
+    </section>
+
+    <section class="section" id="apps">
+      <h2>Semua Aplikasi</h2>
+      <div class="grid" data-grid="all" role="list"></div>
+    </section>
+
+    <footer>
+      <div>⌨️ Tips: tekan <span class="kbd">/</span> untuk fokus ke pencarian • <span class="kbd">T</span> untuk ganti tema</div>
+      <div id="whatsapp">Butuh bantuan? WA admin: <a href="https://wa.me/6285862982928" target="_blank" rel="noopener">0858‑6298‑2928</a></div>
+    </footer>
+  </div>
+
+  <script>
+    // ----- Data Aplikasi (EDIT SESUAI KEBUTUHAN) -----
+    const APPS = [
+      {
+        id: 'kelas-guru',
+        name: 'Kelas Guru',
+        url: '#', // ganti ke URL asli
+        desc: 'Manajemen nilai, tugas, event & gamifikasi untuk kelas.',
+        icon: '📊',
+        tags: ['utama','kelas'],
+        status: 'Stable'
+      },
+      {
+        id: 'gamify-guru',
+        name: 'GamifyGuru',
+        url: '#',
+        desc: 'Konsultan gamifikasi pembelajaran berbasis AI.',
+        icon: '🎮',
+        tags: ['utama','ai'],
+        status: 'Baru'
+      },
+      {
+        id: 'deep-learn-guru',
+        name: 'DeepLearnGuru',
+        url: '#',
+        desc: 'Asisten Pembelajaran Mendalam (PM) sesuai regulasi terbaru.',
+        icon: '🧠',
+        tags: ['ai'],
+        status: 'Beta'
+      },
+      {
+        id: 'soal-craft',
+        name: 'SoalCraft',
+        url: '#',
+        desc: 'Generator soal otomatis untuk guru Indonesia.',
+        icon: '🧪',
+        tags: ['ai','kelas'],
+        status: 'Beta'
+      },
+      {
+        id: 'worksheet-genz',
+        name: 'WorksheetGenZ',
+        url: '#',
+        desc: 'Buat worksheet Gen Z yang interaktif dan estetik.',
+        icon: '📝',
+        tags: ['ai','kelas'],
+        status: 'Stable'
+      },
+      {
+        id: 'ekskul',
+        name: 'Ekstrakurikuler SMP',
+        url: '#',
+        desc: 'Nilai, presensi, dan jurnal kegiatan ekskul.',
+        icon: '🏅',
+        tags: ['eks','admin'],
+        status: 'Stable'
+      },
+      {
+        id: 'tahfidz',
+        name: 'Tahfidz Tracker',
+        url: '#',
+        desc: 'Pantau setoran hafalan, nilai, dan bobot penilaian.',
+        icon: '📖',
+        tags: ['kelas'],
+        status: 'Stable'
+      },
+      {
+        id: 'ipadevpro-invoice',
+        name: 'Invoice Studio',
+        url: '#',
+        desc: 'Buat & cetak invoice profesional untuk layanan Anda.',
+        icon: '🧾',
+        tags: ['admin'],
+        status: 'Stable'
+      }
+    ];
+
+    // ----- Util Storage -----
+    const store = {
+      get(k, def){ try { return JSON.parse(localStorage.getItem(k)) ?? def } catch { return def } },
+      set(k, v){ localStorage.setItem(k, JSON.stringify(v)) }
+    };
+
+    // ----- Tema -----
+    const THEME_KEY = 'schoolhub:theme';
+    const themeBtn = document.getElementById('themeBtn');
+    function setTheme(theme){
+      document.documentElement.setAttribute('data-theme', theme);
+      themeBtn.setAttribute('aria-pressed', theme === 'dark');
+      store.set(THEME_KEY, theme);
+    }
+    setTheme(store.get(THEME_KEY, window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+    themeBtn.addEventListener('click',()=>{
+      const cur = document.documentElement.getAttribute('data-theme');
+      setTheme(cur === 'light' ? 'dark' : 'light');
+    });
+    document.addEventListener('keydown', (e)=>{
+      if(e.key.toLowerCase()==='t') themeBtn.click();
+    });
+
+    // ----- Render Kartu -----
+    const grids = {
+      all: document.querySelector('[data-grid="all"]'),
+      pinned: document.querySelector('[data-grid="pinned"]'),
+      recent: document.querySelector('[data-grid="recent"]')
+    };
+
+    function cardTpl(app){
+      const a = document.createElement('a');
+      a.href = app.url;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.role = 'listitem';
+      a.className = 'card';
+      a.dataset.tags = app.tags.join(',');
+      a.dataset.id = app.id;
+      a.innerHTML = `
+        <div class="icon" aria-hidden="true">${app.icon}</div>
+        <div class="meta">
+          <h3>${app.name}</h3>
+          <div class="desc">${app.desc}</div>
+          <div class="tags">${app.tags.map(t=>`<span class='tag'>#${t}</span>`).join('')}</div>
+        </div>
+        <div class="status">${app.status}</div>
+        <button class="fav" title="Sematkan" aria-label="Sematkan ${app.name}" aria-pressed="false">★</button>
+      `;
+      // klik menyimpan recent
+      a.addEventListener('click', ()=> addRecent(app.id));
+      // cegah klik saat tekan tombol fav
+      a.querySelector('.fav').addEventListener('click', (ev)=>{
+        ev.preventDefault(); ev.stopPropagation();
+        togglePin(app.id, ev.currentTarget);
+      });
+      return a;
+    }
+
+    function renderAll(){
+      grids.all.innerHTML = '';
+      APPS.forEach(app=> grids.all.appendChild(cardTpl(app)));
+      applySearch();
+      hydratePins();
+    }
+
+    // ----- Search & Filter -----
+    const searchEl = document.getElementById('search');
+    const chips = [...document.querySelectorAll('.chip')];
+    let activeCat = 'all';
+
+    function applySearch(){
+      const q = searchEl.value.trim().toLowerCase();
+      const cards = grids.all.querySelectorAll('.card');
+      let visible = 0;
+      cards.forEach(c =>{
+        const text = c.textContent.toLowerCase();
+        const tags = c.dataset.tags.split(',');
+        const inCat = activeCat==='all' || tags.includes(activeCat);
+        const show = inCat && (!q || text.includes(q));
+        c.style.display = show ? '' : 'none';
+        if(show) visible++;
+      });
+      if(!visible){
+        const empty = document.createElement('div');
+        empty.className='empty';
+        empty.textContent='Tidak ditemukan. Coba kata kunci atau kategori lain.';
+        grids.all.appendChild(empty);
+      }
+    }
+
+    searchEl.addEventListener('input', applySearch);
+    document.addEventListener('keydown', (e)=>{ if(e.key==='/'){ e.preventDefault(); searchEl.focus(); } });
+    chips.forEach(ch => ch.addEventListener('click', ()=>{
+      chips.forEach(x=>x.setAttribute('aria-pressed','false'));
+      ch.setAttribute('aria-pressed','true');
+      activeCat = ch.dataset.cat;
+      applySearch();
+    }));
+
+    // ----- Pin / Pinned -----
+    const PIN_KEY = 'schoolhub:pinned';
+    function getPins(){ return new Set(store.get(PIN_KEY, [])); }
+    function setPins(set){ store.set(PIN_KEY, [...set]); }
+
+    function hydratePins(){
+      const pins = getPins();
+      // tombol
+      document.querySelectorAll('.fav').forEach(btn=>{
+        const id = btn.closest('.card').dataset.id;
+        btn.setAttribute('aria-pressed', pins.has(id));
+      });
+      // grid pinned
+      const box = grids.pinned; box.innerHTML = '';
+      const list = APPS.filter(a=> pins.has(a.id));
+      if(list.length===0){ box.innerHTML = '<div class="empty">Belum ada yang disematkan. Klik ikon ★ pada kartu untuk menyematkan.</div>'; return }
+      list.forEach(app=> box.appendChild(cardTpl(app)));
+    }
+
+    function togglePin(id, btn){
+      const pins = getPins();
+      if(pins.has(id)) pins.delete(id); else pins.add(id);
+      setPins(pins);
+      if(btn) btn.setAttribute('aria-pressed', pins.has(id));
+      hydratePins();
+    }
+
+    // ----- Recent -----
+    const RECENT_KEY = 'schoolhub:recent';
+    function addRecent(id){
+      const rec = store.get(RECENT_KEY, []);
+      const next = [id, ...rec.filter(x=>x!==id)].slice(0,6);
+      store.set(RECENT_KEY, next);
+      renderRecent();
+    }
+    function renderRecent(){
+      const rec = store.get(RECENT_KEY, []);
+      const box = grids.recent; box.innerHTML='';
+      if(rec.length===0){ box.innerHTML = '<div class="empty">Belum ada riwayat. Aplikasi yang Anda klik akan muncul di sini.</div>'; return }
+      rec.map(id=> APPS.find(a=>a.id===id)).filter(Boolean).forEach(app=> box.appendChild(cardTpl(app)));
+    }
+
+    // ----- Init -----
+    renderAll();
+    renderRecent();
+  </script>
+</body>
+</html>
